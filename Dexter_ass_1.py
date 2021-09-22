@@ -19,14 +19,14 @@ class Transaction:
         """
         A function that return the hash of the transaction contents.
         """
-        block_string = json.dumps(self.__dict__, sort_keys = True)
+        block_string = json.dumps(self.__dict__, sort_keys=True)
         return sha256(block_string.encode()).hexdigest()
 
 class Block:
     # constructor for the block class.
     def __init__(self, index, transactions, timestamp, previous_hash,nonce = 0):
         self.index = index
-        self.transactions = transactions
+        self.transactions = []
         self.timestamp = timestamp
         self.previous_hash = previous_hash
         self.nonce = nonce
@@ -96,7 +96,6 @@ class Blockchain:
         that satisfies our difficulty criteria, which we set accordingly.
         """
         block.nonce = 0
-
         computed_hash = block.compute_hash()
         while not computed_hash.startswith('0' * Blockchain.difficulty):
             block.nonce += 1
@@ -132,7 +131,17 @@ class Blockchain:
 if  __name__ == "__main__":
     MyBlockchain = Blockchain()
     Transaction1 = Transaction("Aman","Vedang",'5 dogecoin',time.time())
-    MyBlockchain.unconfirmed_transactions.append(Transaction1)
+    Transaction2 = Transaction("Vedang","Vedang",'10 dogecoin',time.time())
+    #print(MyBlockchain.__dict__)
+    MyBlockchain.add_new_transaction(Transaction1)
+    #print(MyBlockchain.__dict__)
+    MyBlockchain.add_new_transaction(Transaction2)
+    #print(MyBlockchain.__dict__)
+    jsonStr = json.dumps(MyBlockchain.last_block.__dict__)
+    print(jsonStr)
     MyBlockchain.mine()
-    print(MyBlockchain.__dict__)
+    #print(MyBlockchain.__dict__)
+    jsonStr = json.dumps(MyBlockchain.last_block.__dict__)
+    print(jsonStr)
+    
 
