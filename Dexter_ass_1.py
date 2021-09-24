@@ -16,7 +16,7 @@ class Transaction:
         self.fromAddress = fromAddress
         self.toAddress = toAddress
         self.amount = amount
-        self.timestamp = timestamp
+        self.timestamp = timestamp=
     
     def compute_hash(self):
         """
