@@ -1,1 +1,1 @@
-# This will include our Blockchain assignments througout the semester..
+# This will include our Blockchain assignments throughout the semester.

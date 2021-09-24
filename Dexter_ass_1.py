@@ -1,6 +1,7 @@
 from hashlib import sha256
 import json
 import time
+from json import JSONEncoder
 
 """
 from flask import Flask, request
@@ -17,25 +18,32 @@ class Transaction:
     
     def compute_hash(self):
         """
-        A function that return the hash of the transaction contents.
+        A function that returns the hash of the transaction contents.
         """
         block_string = json.dumps(self.__dict__, sort_keys=True)
         return sha256(block_string.encode()).hexdigest()
 
+
+class BlockEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
+
 class Block:
-    # constructor for the block class.
+    """
+    constructor for the block class.
+    """
     def __init__(self, index, transactions, timestamp, previous_hash,nonce = 0):
         self.index = index
-        self.transactions = []
+        self.transactions = transactions 
         self.timestamp = timestamp
         self.previous_hash = previous_hash
         self.nonce = nonce
-
+        
     def compute_hash(self):
         """
-        A function that return the hash of the block contents.
+        A function that returns the hash of the block contents.
         """
-        block_string = json.dumps(self.__dict__, sort_keys = True)
+        block_string = json.dumps(self.__dict__, sort_keys = True,indent=4, cls=BlockEncoder)
         return sha256(block_string.encode()).hexdigest()
 
 class Blockchain:
@@ -117,10 +125,10 @@ class Blockchain:
 
         last_block = self.last_block
 
-        new_block = Block(index = last_block.index + 1,
-                          transactions = self.unconfirmed_transactions,
-                          timestamp = time.time(),
-                          previous_hash = last_block.hash)
+        new_block = Block(last_block.index + 1,
+                          self.unconfirmed_transactions,
+                          time.time(),
+                          last_block.hash)
 
         proof = self.proof_of_work(new_block)
         self.add_block(new_block, proof)
@@ -129,19 +137,19 @@ class Blockchain:
         return new_block.index
 
 if  __name__ == "__main__":
-    MyBlockchain = Blockchain()
-    Transaction1 = Transaction("Aman","Vedang",'5 dogecoin',time.time())
-    Transaction2 = Transaction("Vedang","Vedang",'10 dogecoin',time.time())
+    myBlockchain = Blockchain()
+    transaction1 = Transaction("Aman","Vedang",'5 dogecoin',time.time())
+    transaction2 = Transaction("Vedang","Vedang",'10 dogecoin',time.time())
     #print(MyBlockchain.__dict__)
-    MyBlockchain.add_new_transaction(Transaction1)
+    myBlockchain.add_new_transaction(transaction1)
     #print(MyBlockchain.__dict__)
-    MyBlockchain.add_new_transaction(Transaction2)
+    myBlockchain.add_new_transaction(transaction2)
     #print(MyBlockchain.__dict__)
-    jsonStr = json.dumps(MyBlockchain.last_block.__dict__)
+    jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
     print(jsonStr)
-    MyBlockchain.mine()
+    myBlockchain.mine()
     #print(MyBlockchain.__dict__)
-    jsonStr = json.dumps(MyBlockchain.last_block.__dict__)
+    jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
     print(jsonStr)
     
 
