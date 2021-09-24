@@ -1,16 +1,18 @@
-from hashlib import sha256
 import json
 import time
+from hashlib import sha256
 from json import JSONEncoder
 
-"""
-from flask import Flask, request
-import requests
-"""
-
 class Transaction:
-    # constructor for the transaction class.
+    
     def __init__(self,fromAddress,toAddress,amount,timestamp):
+        """
+        Constructor for the `Transaction` class.
+        :param fromAddress: who is sending.
+        :param toAddress: who is recieving.
+        :amount: amount sent.
+        :param timestamp: Time of generation of the transaction.
+        """
         self.fromAddress = fromAddress
         self.toAddress = toAddress
         self.amount = amount
@@ -18,21 +20,23 @@ class Transaction:
     
     def compute_hash(self):
         """
-        A function that returns the hash of the transaction contents.
+        Creates a SHA-256 hash of a transaction
+        :param block: Transaction.
         """
         block_string = json.dumps(self.__dict__, sort_keys=True)
         return sha256(block_string.encode()).hexdigest()
 
-
-class BlockEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
-
 class Block:
-    """
-    constructor for the block class.
-    """
+    
     def __init__(self, index, transactions, timestamp, previous_hash,nonce = 0):
+        """
+        Constructor for the `Block` class.
+        :param index: Unique ID of the block.
+        :param transactions: List of transactions.
+        :param timestamp: Time of generation of the block.
+        :previos_hash: hash of the previos block.
+        :nonce: Nonce of the block.
+        """
         self.index = index
         self.transactions = transactions 
         self.timestamp = timestamp
@@ -41,17 +45,21 @@ class Block:
         
     def compute_hash(self):
         """
-        A function that returns the hash of the block contents.
+        Creates a SHA-256 hash of a Block
+        :param block: Block.
         """
-        block_string = json.dumps(self.__dict__, sort_keys = True,indent=4, cls=BlockEncoder)
+        block_string = json.dumps(self.__dict__, sort_keys=True, indent=4, cls=BlockEncoder)
         return sha256(block_string.encode()).hexdigest()
 
 class Blockchain:
     # difficulty of our PoW algorithm.
+    # should be choosed accordingly.
     difficulty = 2
 
-    # constructor for the Blockchain class.
     def __init__(self):
+        """
+        Constructor for the `Blockchain` class.
+        """
         self.unconfirmed_transactions = []
         self.chain = []
         self.create_genesis_block()
@@ -68,8 +76,12 @@ class Blockchain:
 
     @property
     def last_block(self):
+        """
+        A quick pythonic way to retrieve the most recent block in the chain. Note that
+        the chain will always consist of at least one block (i.e., genesis block)
+        """
         return self.chain[-1]
-
+    
     def add_block(self, block, proof):
         """
         A function that adds the block to the chain after verification.
@@ -101,7 +113,7 @@ class Blockchain:
     def proof_of_work(self, block):
         """
         Function that tries different values of nonce to get a hash
-        that satisfies our difficulty criteria, which we set accordingly.
+        that satisfies our difficulty criteria, which we set according to the need.
         """
         block.nonce = 0
         computed_hash = block.compute_hash()
@@ -112,6 +124,10 @@ class Blockchain:
         return computed_hash
 
     def add_new_transaction(self, transaction):
+        """
+        This function adds new transaction to unconfirmed transactions pool
+        which will be verified than added to block when mined.
+        """
         self.unconfirmed_transactions.append(transaction)
 
     def mine(self):
@@ -124,7 +140,10 @@ class Blockchain:
             return False
 
         last_block = self.last_block
-
+        
+        # creating new block which will all unconfirmed transactions.
+        # will be added after the last block in the blockchain.
+        
         new_block = Block(last_block.index + 1,
                           self.unconfirmed_transactions,
                           time.time(),
@@ -133,23 +152,43 @@ class Blockchain:
         proof = self.proof_of_work(new_block)
         self.add_block(new_block, proof)
 
+        # clearing all the pending transactions as added to the block.
         self.unconfirmed_transactions = []
         return new_block.index
+
+class BlockEncoder(JSONEncoder):
+    """
+    This class overrides the default() method of a JSONEncoder class,
+    so we able to convert custom Python Block object into JSON.
+    """
+    def default(self, o):
+        return o.__dict__
+
+class BlockChainEncoder(JSONEncoder):
+    """
+    This class overrides the default() method of a JSONEncoder class,
+    so we able to convert custom Python Blockchain object into JSON.
+    """
+    def default(self, o):
+        return o.__dict__
 
 if  __name__ == "__main__":
     myBlockchain = Blockchain()
     transaction1 = Transaction("Aman","Vedang",'5 dogecoin',time.time())
     transaction2 = Transaction("Vedang","Vedang",'10 dogecoin',time.time())
-    #print(MyBlockchain.__dict__)
+    transaction3 = Transaction("Shubh","Aman","5 BTC",time.time())
     myBlockchain.add_new_transaction(transaction1)
     #print(MyBlockchain.__dict__)
     myBlockchain.add_new_transaction(transaction2)
-    #print(MyBlockchain.__dict__)
-    jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
-    print(jsonStr)
+    
+    #print(jsonStr)
+    #jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
+    #print(jsonStr)
     myBlockchain.mine()
-    #print(MyBlockchain.__dict__)
-    jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
+    myBlockchain.add_new_transaction(transaction3)
+    #myBlockchain.mine()
+    jsonStr = json.dumps(myBlockchain.__dict__, indent=4 , cls=BlockChainEncoder)
+    #jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
     print(jsonStr)
     
 
