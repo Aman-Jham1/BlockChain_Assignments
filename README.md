@@ -1,6 +1,6 @@
 # This will include our Blockchain assignments throughout the semester.
 
-#Assignment 1:
+**Assignment 1**:
 Link for the problem statement: https://docs.google.com/document/d/1-cIKJF17hL4H00a8stTkdLQxU_CPPgkJ-C2N3jurqXs/edit
 
 We have implemented simple Blockchain in python using object oriented paradigm.
@@ -26,7 +26,7 @@ Following choices are given:
 2. To add a new transaction.
 3. To mine a new block.
 
-Code is well #commented.
+Code is well **commented**.
 
 Group No. 33:
 1. Aman - 2019A7PS0071H
