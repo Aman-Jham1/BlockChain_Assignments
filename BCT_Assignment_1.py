@@ -257,10 +257,3 @@ if  __name__ == "__main__":
                 print(json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder))       
             
                 
-        
-        
-        
-        
-   
-    
-
