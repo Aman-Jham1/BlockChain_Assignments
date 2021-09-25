@@ -10,13 +10,15 @@ class Transaction:
         Constructor for the `Transaction` class.
         :param fromAddress: who is sending.
         :param toAddress: who is recieving.
-        :amount: amount sent.
+        :param amount: amount sent.
         :param timestamp: Time of generation of the transaction.
         """
-        self.fromAddress = fromAddress
-        self.toAddress = toAddress
-        self.amount = amount
-        self.timestamp = timestamp
+        self.transaction = {
+            "fromAddress": fromAddress,
+            "toAddress": toAddress,
+            "amount": amount,
+            "timestamp": timestamp
+        }
     
     def compute_hash(self):
         """
@@ -34,7 +36,7 @@ class Block:
         :param index: Unique ID of the block.
         :param transactions: List of transactions.
         :param timestamp: Time of generation of the block.
-        :previos_hash: hash of the previos block.
+        :param previos_hash: hash of the previos block.
         :nonce: Nonce of the block.
         """
         self.index = index
@@ -173,22 +175,79 @@ class BlockChainEncoder(JSONEncoder):
         return o.__dict__
 
 if  __name__ == "__main__":
-    myBlockchain = Blockchain()
-    transaction1 = Transaction("Aman","Vedang",'5 dogecoin',time.time())
-    transaction2 = Transaction("Vedang","Vedang",'10 dogecoin',time.time())
-    transaction3 = Transaction("Shubh","Aman","5 BTC",time.time())
-    myBlockchain.add_new_transaction(transaction1)
-    #print(MyBlockchain.__dict__)
-    myBlockchain.add_new_transaction(transaction2)
+    # myBlockchain = Blockchain()
+    # transaction1 = Transaction("Aman","Vedang",'5 dogecoin',time.time())
+    # transaction2 = Transaction("Vedang","AMan",'10 dogecoin',time.time())
+    # transaction3 = Transaction("Shubh","Aman","5 BTC",time.time())
+    # myBlockchain.add_new_transaction(transaction1)
     
-    #print(jsonStr)
-    #jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
-    #print(jsonStr)
-    myBlockchain.mine()
-    myBlockchain.add_new_transaction(transaction3)
-    #myBlockchain.mine()
-    jsonStr = json.dumps(myBlockchain.__dict__, indent=4 , cls=BlockChainEncoder)
-    #jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
-    print(jsonStr)
+    # myBlockchain.add_new_transaction(transaction2)
+    
+    # #print(jsonStr)
+    # #jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
+    # #print(jsonStr)
+    # myBlockchain.mine()
+    # myBlockchain.add_new_transaction(transaction3)
+    # #myBlockchain.mine()
+    # #myBlockchain.mine()
+    # #hash1 = myBlockchain.last_block.hash
+    # jsonStr = json.dumps(myBlockchain.__dict__, indent=4 , cls=BlockChainEncoder)
+    # print(jsonStr)
+    # delattr(myBlockchain.last_block,"hash")
+    # hash1 = myBlockchain.last_block.compute_hash();
+    # myBlockchain.last_block.transactions[0].amount = "10 dogecoin"
+    # hash2 = myBlockchain.last_block.compute_hash();
+    # jsonStr = json.dumps(myBlockchain.__dict__, indent=4 , cls=BlockChainEncoder)
+    # #jsonStr = json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder)
+    # #print(jsonStr)
+    # #print(hash1)
+    # #print(hash2)
+    
+    myBlockchain = Blockchain()
+    
+    operations = """Enter according want you want to do with blockchain,
+    Enter 1 if you want to print the current BlockChain
+    Enter 2 if you want to add a new transaction
+    Enter 3 if you want to mine a new block."""
+    
+    operation_dict = {
+        "1": "Print blockchain",
+        "2": "Add transaction",
+        "3": "Mine Block"
+    }
+    
+    add_transaction = "Enter fromAddress, toAddress, and Amount, each in a new line"
+    
+    while True:
+        print()
+        print(operations)
+        print()
+        cur_oper = int(input())
+        print()
+        if cur_oper == 1:
+            #print(myBlockchain.chain)
+            jsonStr = json.dumps(myBlockchain.__dict__, indent=4 , cls=BlockChainEncoder)
+            print(jsonStr)
+        elif cur_oper == 2:
+            print(add_transaction)
+            print()
+            fromAddress = input()
+            toAddress = input()
+            amount = input()
+            myBlockchain.add_new_transaction((fromAddress,toAddress,amount,time.time()))
+        else:
+            if not myBlockchain.mine():
+                print("No pending transactions.")
+            else:
+                print("Mining a new block is successful.") 
+                print("Mined Block is : ")
+                print(json.dumps(myBlockchain.last_block.__dict__, indent=4, cls=BlockEncoder))       
+            
+                
+        
+        
+        
+        
+   
     
 
